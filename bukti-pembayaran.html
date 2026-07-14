@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bukti Bayar - Sabda Cemilan</title>
+    <style>
+        body { font-family: Poppins, sans-serif; background: #FFF8F0; padding: 20px; text-align: center; }
+      .box { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h2 { color: #FF6B35; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #FF6B35; color: white; font-weight: bold; border: none; cursor: pointer; }
+        button:hover { background: #e85a28; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Kirim Bukti Pembayaran</h2>
+        <p>Setelah transfer, upload bukti di bawah ya 👇</p>
+
+        <!-- INI DITARO DI ATAS -->
+        <div id="info-bayar" style="background:#FFF8F0; padding:15px; border-radius:10px; margin-bottom:15px;"></div>
+
+        <form id="buktiForm">
+            <input type="text" id="nama" placeholder="Nama Pemesan" required>
+            <input type="text" id="kodePesanan" placeholder="NO HP" required>
+            <input type="file" id="buktiBayar" accept="image/*" required>
+            <button type="submit">Kirim ke Admin</button>
+        </form>
+        <p id="status"></p>
+    </div>
+
+<script>
+// 1. Ambil data dari URL dulu
+const urlParams = new URLSearchParams(window.location.search);
+const metode = urlParams.get('metode');
+const total = urlParams.get('total');
+
+// 2. Tampilin di halaman
+document.getElementById('info-bayar').innerHTML = `
+    <p>Metode: <b>${metode}</b></p>
+    <p>Total Bayar: <b>Rp ${parseInt(total).toLocaleString('id-ID')}</b></p>
+`;
+
+document.getElementById('buktiForm').onsubmit = async function(e) {
+    e.preventDefault();
+    document.getElementById('status').innerText = "Mengirim...";
+
+    let nama = document.getElementById('nama').value;
+    let kode = document.getElementById('kodePesanan').value;
+    let file = document.getElementById('buktiBayar').files[0];
+
+    let formData = new FormData();
+    formData.append('target', '628998628025'); // INI NO WA KAMU. UDAH BENER
+    
+    // Pesan digabung sekalian sama metode + total
+    formData.append('message', `🔔 BUKTI BAYAR BARU
+Nama: ${nama}
+Kode: ${no}
+Metode: ${metode}
+Total: Rp ${parseInt(total).toLocaleString('id-ID')}`);
+Halo Admin Sabda Cemilan 💛
+Saya sudah bayar yaa...
+
+---
+Terima kasih sudah order di Sabda Cemilan! 
+Semoga keripiknya bikin nagih yaa 😋
+Reseller welcome loh kaa ✨
+    
+    formData.append('file', file);
+
+    // 3. WAJIB GANTI INI DENGAN TOKEN KAMU
+    let response = await fetch('https://api.fonnte.com/send', {
+    method: 'POST',
+    headers: { 'Authorization': 'ZqfkL2LdHfVoXa4K4cDN' }, // <-- GANTI JADI INI
+    body: formData
+});
+
+    if(response.ok) {
+        document.getElementById('status').innerText = "✅ Bukti berhasil terkirim! Admin akan segera konfirmasi";
+        document.getElementById('buktiForm').reset();
+    } else {
+        document.getElementById('status').innerText = "❌ Gagal kirim. Cek token Fonnte";
+    }
+}
+</script>
+</body>
+<div style="text-align:center; padding:30px; background:#FFF9E6; border-radius:15px; margin:20px auto; max-width:500px;">
+  <div style="font-size:50px;">🎉</div>
+  <h2 style="color:#FF6B00;">Makasih Banyak Kaa! 🙏</h2>
+  <p style="font-size:15px; color:#555;">
+    Bukti bayar kamu udah kami terima yaa <br>
+    Pesanan Sabda Cemilan kamu akan kami kirim di <b>Sabtu/Minggu</b> <br><br>
+    Ditunggu yaa keripik renyahnya 🥳 <br>
+    Jangan lupa review setelah nyampe yaa
+  </p>
+</div>
+</html>
