@@ -186,7 +186,7 @@ function kirimWA(metode, total, keranjang) {
     });
     pesan += `\nTerima kasih sudah belanja di Sabda Cemilan 🙏`;
 
-    let url = `https://wa.me/${noWaKamu}?text=${encodeURIComponent(pesan)}`;
+    let url = `https://wa.me/${628998628025}?text=${encodeURIComponent(pesan)}`;
     window.open(url, '_blank');
 
     alert('Terima kasih! Silakan kirim bukti transfer jika diperlukan.');
