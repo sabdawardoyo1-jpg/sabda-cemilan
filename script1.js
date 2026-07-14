@@ -186,7 +186,7 @@ function konfirmasiBayar(metode, total) {
     });
     pesan += `\nTerima kasih sudah belanja di Sabda Cemilan 🙏`;
 
-    let url = `https://wa.me/${noAdmin}?text=${encodeURIComponent(pesan)}`;
+    let url = `https://wa.me/${62998628025}?text=${encodeURIComponent(pesan)}`;
     window.open(url, '_blank');
 
     alert('Terima kasih! Silakan kirim bukti transfer jika diperlukan.');
