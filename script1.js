@@ -173,11 +173,11 @@ function bayar(metode) {
 //     updateKeranjangIcon();
 //     tutupKeranjang();
 // }
-function konfirmasiBayar(metode, total) {
-    let noAdmin = "62998628025"; // GANTI NOMOR WA KAMU
-
+function kirimWA(metode, total, keranjang) {
+    const noWaKamu = "628998628025" // GANTI INI DENGAN NOMOR KAMU
+    
     let pesan = `Halo Admin Sabda Cemilan 👋\n`;
-    pesan += `Selamat datang, saya mau konfirmasi pembayaran ya 😊\n\n`; // INI SALAMNYA
+    pesan += `Selamat datang, saya mau konfirmasi pembayaran ya 😊\n\n`;
     pesan += `Metode: ${metode}\n`;
     pesan += `Total Bayar: Rp ${total.toLocaleString('id-ID')}\n\n`;
     pesan += `Detail Pesanan:\n`;
@@ -186,7 +186,7 @@ function konfirmasiBayar(metode, total) {
     });
     pesan += `\nTerima kasih sudah belanja di Sabda Cemilan 🙏`;
 
-    let url = `https://wa.me/${62998628025}?text=${encodeURIComponent(pesan)}`;
+    let url = `https://wa.me/${noWaKamu}?text=${encodeURIComponent(pesan)}`;
     window.open(url, '_blank');
 
     alert('Terima kasih! Silakan kirim bukti transfer jika diperlukan.');
