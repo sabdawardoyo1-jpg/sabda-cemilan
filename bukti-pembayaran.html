@@ -4,14 +4,14 @@
     <title>Bukti Bayar - Sabda Cemilan</title>
     <style>
         body { font-family: Poppins, sans-serif; background: #FFF8F0; padding: 20px; text-align: center; }
-      .box { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+     .box { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
         h2 { color: #FF6B35; }
         input, button, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; text-align: left; }
         button { background: #FF6B35; color: white; font-weight: bold; border: none; cursor: pointer; }
         button:hover { background: #e85a28; }
-        #preview { max-width: 100%; margin-top: 10px; border-radius: 10px; display: none; border: 1px solid #eee; }
-      .info { background:#FFF8F0; padding:15px; border-radius:10px; margin-bottom:15px; text-align: left; }
-      .info pre { background: white; padding: 10px; border-radius: 5px; font-size: 13px; white-space: pre-wrap; }
+        #preview { max-width: 100%; margin-top: 10px; border-radius: 10px; display: none; }
+     .info { background:#FFF8F0; padding:15px; border-radius:10px; margin-bottom:15px; text-align: left; }
+     .info pre { background: white; padding: 10px; border-radius: 5px; font-size: 13px; white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
             <textarea id="alamat" placeholder="Alamat Lengkap" rows="3" required></textarea>
             <input type="file" id="buktiBayar" accept="image/*" required>
             <img id="preview">
-            <button type="submit">Kirim ke Admin</button>
+            <button type="submit">Kirim ke Admin via WhatsApp</button>
         </form>
         <p id="status"></p>
     </div>
@@ -39,11 +39,13 @@ const noAdmin = "628998628025"; // GANTI NO WA KAMU
 const urlParams = new URLSearchParams(window.location.search);
 const metode = urlParams.get('metode');
 const total = urlParams.get('total');
-const keranjang = JSON.parse(localStorage.getItem('pesananSabda')) || [];
+const keranjang = JSON.parse(localStorage.getItem('pesananSabda')) || []; // AMBIL DARI SINI
 
-// 2. Buat list pesanan
+// 2. Buat list pesanan + total qty
 let listPesanan = '';
+let totalQty = 0;
 keranjang.forEach(item => {
+    totalQty += item.jumlah;
     listPesanan += `- ${item.nama} x ${item.jumlah} = Rp ${(item.harga * item.jumlah).toLocaleString('id-ID')}\n`;
 });
 
@@ -51,6 +53,7 @@ keranjang.forEach(item => {
 document.getElementById('info-bayar').innerHTML = `
     <p><b>Metode:</b> ${metode}</p>
     <p><b>Total Bayar:</b> Rp ${parseInt(total).toLocaleString('id-ID')}</p>
+    <p><b>Total Item:</b> ${totalQty} Produk</p>
     <p><b>Detail Pesanan:</b></p>
     <pre>${listPesanan}</pre>
 `;
@@ -74,7 +77,7 @@ document.getElementById('buktiForm').onsubmit = async function(e) {
     let alamat = document.getElementById('alamat').value;
     let file = document.getElementById('buktiBayar').files[0];
 
-    // PESAN LENGKAP + LIST PESANAN
+    // PESAN LENGKAP + LIST PESAN + JUMLAH
     let pesanWA = `🔔 *BUKTI BAYAR BARU* 🔔\n\n`;
     pesanWA += `*Data Pemesan*\n`;
     pesanWA += `Nama: ${nama}\n`;
@@ -82,28 +85,29 @@ document.getElementById('buktiForm').onsubmit = async function(e) {
     pesanWA += `Alamat: ${alamat}\n\n`;
     pesanWA += `*Detail Pesanan*\n`;
     pesanWA += `Metode: ${metode}\n`;
-    pesanWA += `Total: Rp ${parseInt(total).toLocaleString('id-ID')}\n`;
-    pesanWA += `${listPesanan}\n`;
+    pesanWA += `Total Item: ${totalQty} Produk\n`;
+    pesanWA += `Total Bayar: Rp ${parseInt(total).toLocaleString('id-ID')}\n\n`;
+    pesanWA += `*Rincian:*\n${listPesanan}\n`;
     pesanWA += `Catatan: Pengiriman Sabtu/Minggu\n`;
     pesanWA += `Mohon segera diproses ya 🙏`;
 
     // KIRIM VIA FONNTE API - GAMBAR + PESAN
     let formData = new FormData();
     formData.append('target', noAdmin);
-    formData.append('message', pesanWA); // ini caption gambarnya
+    formData.append('message', pesanWA);
     formData.append('file', file);
 
     try {
         let response = await fetch('https://api.fonnte.com/send', {
             method: 'POST',
-            headers: { 'Authorization': 'ZqfkL2LdHfVoXa4K4cDN' }, // <-- GANTI TOKEN KAMU
+            headers: { 'Authorization': 'ZqfkL2LdHfVoXa4K4cDN' }, // GANTI TOKEN KAMU
             body: formData
         });
 
         let result = await response.json();
         if(result.status) {
             document.getElementById('status').innerText = "✅ Bukti berhasil terkirim! Admin akan segera konfirmasi";
-            localStorage.removeItem('pesananSabda'); // hapus data
+            localStorage.removeItem('pesananSabda'); // hapus data biar ga numpuk
             document.getElementById('buktiForm').reset();
             document.getElementById('preview').style.display = 'none';
         } else {
@@ -120,8 +124,7 @@ document.getElementById('buktiForm').onsubmit = async function(e) {
   <h2 style="color:#FF6B00;">Makasih Banyak Kaa! 🙏</h2>
   <p style="font-size:15px; color:#555;">
      Pesanan Sabda Cemilan kamu akan kami kirim di <b>Sabtu/Minggu</b> <br><br>
-    Ditunggu yaa keripik renyahnya 🥳 <br>
-    Jangan lupa review setelah nyampe yaa
+    Ditunggu yaa keripik renyahnya 🥳
   </p>
 </div>
 </body>
