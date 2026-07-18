@@ -3,86 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Bukti - Sabda Cemilan</title>
+    <title>Upload Bukti Pembayaran - Sabda Cemilan</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #fefefe; margin: 0; padding: 20px; }
-       .container-bukti {
-            max-width: 550px;
-            margin: 20px auto;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f5f5f5; padding: 20px; }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
             background: #fff;
             border-radius: 16px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             overflow: hidden;
         }
-       .header-bukti {
-            background: #ff6b6b;
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
             color: white;
             text-align: center;
-            padding: 20px;
+            padding: 25px 20px;
         }
-       .header-bukti h2 { margin: 0; font-size: 20px; }
-       .header-bukti p { margin: 5px 0 0; font-size: 14px; opacity: 0.9; }
+        .header h2 { font-size: 22px; margin-bottom: 5px; }
+        .header p { font-size: 14px; opacity: 0.9; }
 
-       .info-pesanan {
+        .info-pesanan {
             background: #fff7ed;
-            padding: 15px;
             margin: 15px;
+            padding: 15px;
             border-radius: 10px;
-            font-size: 14px;
+            border-left: 4px solid #ff6b6b;
         }
-       .info-pesanan h3 { margin-top: 0; color: #ff6b6b; }
-       .list-produk pre {
-            background: #fff;
+        .info-pesanan h3 { color: #ff6b6b; margin-bottom: 10px; font-size: 16px; }
+        .info-pesanan p { margin: 5px 0; font-size: 14px; }
+        .list-produk {
+            background: white;
             padding: 10px;
             border-radius: 8px;
+            margin-top: 10px;
+        }
+        .list-produk pre {
             white-space: pre-wrap;
             font-family: 'Courier New', monospace;
             font-size: 13px;
+            line-height: 1.6;
         }
 
-       .form-bukti { padding: 0 20px 20px 20px; }
-       .form-group { margin-bottom: 15px; }
-       .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-       .form-group input,.form-group textarea {
+        .form-bukti { padding: 20px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #333;
+        }
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 2px solid #eee;
             border-radius: 8px;
             font-size: 14px;
+            transition: 0.3s;
         }
-       .form-group input:focus,.form-group textarea:focus {
+        .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #ff6b6b;
         }
         #preview {
             max-width: 100%;
             margin-top: 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             display: none;
-            border: 1px solid #eee;
+            border: 2px dashed #ddd;
         }
-       .btn-kirim {
+        .btn-kirim {
             width: 100%;
             padding: 14px;
             background: #25D366;
             color: white;
             font-weight: bold;
+            font-size: 16px;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
             cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-kirim:hover { background: #1ebe5b; transform: translateY(-2px); }
+        .note {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
             margin-top: 10px;
         }
-       .btn-kirim:hover { background: #1ebe5b; }
     </style>
 </head>
 <body>
-<div class="container-bukti">
-    <header class="header-bukti">
+
+<div class="container">
+    <div class="header">
         <h2>📸 Upload Bukti Pembayaran</h2>
-        <p>Sabda Cemilan</p>
-    </header>
+        <p>Sabda Cemilan - Kripik & Jamu Herbal</p>
+    </div>
 
     <div class="info-pesanan" id="infoPesanan">
         Memuat data pesanan...
@@ -90,102 +109,40 @@
 
     <form id="formBukti" class="form-bukti">
         <div class="form-group">
-            <label>Nama Pemesan</label>
-            <input type="text" id="nama" placeholder="Nama lengkap kamu" required>
+            <label>Nama Pemesan *</label>
+            <input type="text" id="nama" placeholder="Contoh: Budi Santoso" required>
         </div>
 
         <div class="form-group">
-            <label>No. WhatsApp</label>
-            <input type="tel" id="nohp" placeholder="08xxxxxxxxxx" required>
+            <label>No. WhatsApp *</label>
+            <input type="tel" id="nohp" placeholder="Contoh: 08123456789" required>
         </div>
 
         <div class="form-group">
-            <label>Alamat Pengiriman</label>
-            <textarea id="alamat" placeholder="Alamat lengkap" rows="3" required></textarea>
+            <label>Alamat Pengiriman *</label>
+            <textarea id="alamat" placeholder="Alamat lengkap + patokan" rows="3" required></textarea>
         </div>
 
         <div class="form-group">
-            <label>Upload Bukti Transfer</label>
+            <label>Upload Bukti Transfer *</label>
             <input type="file" id="bukti" accept="image/*" required>
             <img id="preview" alt="Preview Bukti">
         </div>
 
         <div class="form-group">
             <label>Catatan Tambahan</label>
-            <textarea id="catatan" placeholder="Contoh: Tolong kirim hari sabtu" rows="2"></textarea>
+            <textarea id="catatan" placeholder="Contoh: Tolong kirim hari Sabtu" rows="2"></textarea>
         </div>
 
         <button type="submit" class="btn-kirim">Kirim ke Admin via WhatsApp</button>
+        <p class="note">Setelah klik, WA akan terbuka. Silakan lampirkan foto bukti transfer.</p>
     </form>
 </div>
 
 <script>
-    const noAdmin = "628998628025"; // <-- PENTING: GANTI NOMOR WA KAMU
+    const noAdmin = "628998628025"; // <-- GANTI DENGAN NOMOR WA KAMU
 
-    // 1. Ambil data dari URL dan localStorage
+    // Ambil data dari URL dan localStorage
     const urlParams = new URLSearchParams(window.location.search);
-    const metode = urlParams.get('metode');
-    const total = urlParams.get('total');
-    const keranjang = JSON.parse(localStorage.getItem('pesananSabda')) || [];
-
-    // 2. Tampilkan info pesanan + list
-    let listPesanan = '';
-    if(keranjang.length > 0){
-        keranjang.forEach(item => {
-            listPesanan += `- ${item.nama} x ${item.jumlah} = Rp ${(item.harga * item.jumlah).toLocaleString('id-ID')}\n`;
-        });
-    } else {
-        listPesanan = 'Data pesanan tidak ditemukan';
-    }
-
-    document.getElementById('infoPesanan').innerHTML = `
-        <h3>Rincian Pesanan</h3>
-        <p><b>Metode:</b> ${metode}</p>
-        <p><b>Total Bayar:</b> Rp ${Number(total).toLocaleString('id-ID')}</p>
-        <div class="list-produk">
-            <b>Detail:</b><br>
-            <pre>${listPesanan}</pre>
-        </div>
-    `;
-
-    // 3. Preview gambar
-    document.getElementById('bukti').onchange = function(e){
-        let reader = new FileReader();
-        reader.onload = function(event){
-            document.getElementById('preview').src = event.target.result;
-            document.getElementById('preview').style.display = 'block';
-        }
-        reader.readAsDataURL(e.target.files[0]);
-    }
-
-    // 4. Kirim ke WA
-    document.getElementById('formBukti').onsubmit = function(e){
-        e.preventDefault();
-        const nama = document.getElementById('nama').value;
-        const nohp = document.getElementById('nohp').value;
-        const alamat = document.getElementById('alamat').value;
-        const catatan = document.getElementById('catatan').value;
-
-        let pesan = `Halo Admin Sabda Cemilan 👋\n\n`;
-        pesan += `*KONFIRMASI PEMBAYARAN*\n\n`;
-        pesan += `*Data Pemesan*\n`;
-        pesan += `Nama: ${nama}\n`;
-        pesan += `No HP: ${nohp}\n`;
-        pesan += `Alamat: ${alamat}\n\n`;
-        pesan += `*Detail Pesanan*\n`;
-        pesan += `Metode: ${metode}\n`;
-        pesan += `Total: Rp ${Number(total).toLocaleString('id-ID')}\n`;
-        pesan += `${listPesanan}\n`;
-        pesan += `Catatan: ${catatan}\n\n`;
-        pesan += `Bukti transfer sudah saya upload. Mohon dicek ya 🙏`;
-
-        let url = `https://wa.me/${noAdmin}?text=${encodeURIComponent(pesan)}`;
-        window.open(url, '_blank');
-
-        localStorage.removeItem('pesananSabda'); // bersihkan setelah kirim
-        alert('Oke! Sekarang silakan kirim foto bukti transfer di WA yang baru terbuka.');
-        window.location.href = "index.html"; // balik ke halaman utama
-    }
-</script>
-</body>
-</html>
+    const metode = urlParams.get('metode') || '-';
+    const total = urlParams.get('total') || 0
