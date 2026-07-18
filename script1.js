@@ -125,7 +125,7 @@ function kirimWA(metode, total) {
     keranjang.forEach(item => { pesan += `- ${item.nama} x ${item.jumlah}\n`; });
     pesan += `\nTerima kasih 🙏`;
 
-    let url = `https://wa.me/${noAdminWA}?text=${encodeURIComponent(pesan)}`;
+    let url = `https://wa.me/${628998628025}?text=${encodeURIComponent(pesan)}`;
     window.open(url, '_blank');
 
     keranjang = [];
