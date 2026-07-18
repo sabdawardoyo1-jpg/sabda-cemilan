@@ -10,10 +10,7 @@ function bukaModalProduk() {
     document.getElementById('judul-modal').innerText = produkSementara.nama;
     document.getElementById('isi-keranjang').innerHTML = `
         <div class="item-keranjang">
-            <div>
-                <b>${produkSementara.nama}</b><br>
-                Rp ${produkSementara.harga.toLocaleString('id-ID')}
-            </div>
+            <div><b>${produkSementara.nama}</b><br>Rp ${produkSementara.harga.toLocaleString('id-ID')}</div>
             <div>
                 <button class="qty-btn" onclick="kurangQtySementara()">-</button>
                 <span style="padding: 0 10px; font-weight: bold;">${produkSementara.jumlah}</span>
@@ -91,6 +88,7 @@ function bayar(metode) {
     if (keranjang.length === 0) { alert('Keranjang masih kosong!'); return; }
 
     let total = keranjang.reduce((sum, item) => sum + item.harga * item.jumlah, 0);
+
     let infoPembayaran = "";
     if(metode === 'DANA'){
         infoPembayaran = `Transfer ke DANA: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><br><img src="dana.jpg" style="width:200px; margin:auto; display:block;"><p style="font-size:14px;">Scan QR DANA di atas</p>`;
@@ -110,7 +108,7 @@ function bayar(metode) {
             <p style="font-size:14px; color:gray;">Setelah transfer, klik tombol di bawah</p>
         </div>`;
 
-    // PENTING: SIMPAN KERANJANG BIAR BISA DIBACA DI HALAMAN BUKTI
+    // INI PENTING BANGET: SIMPAN KERANJANG DULU
     localStorage.setItem('pesananSabda', JSON.stringify(keranjang));
 
     document.getElementById('btn-aksi').style.display = 'block';
