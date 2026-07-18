@@ -1,31 +1,27 @@
-function bayar(metode) {
-    let total = keranjang.reduce((sum, item) => sum + item.harga * item.jumlah, 0);
-    let infoPembayaran = "";
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Bukti - Sabda Cemilan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container-bukti">
+    <header class="header-bukti">
+        <h2>📸 Upload Bukti Pembayaran</h2>
+        <p>Sabda Cemilan</p>
+    </header>
 
-    if(metode === 'DANA'){
-        infoPembayaran = `Transfer ke DANA: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><img src="dana.jpg" style="width:200px; margin:auto; display:block;"><p>Scan QR DANA di atas</p>`;
-    }
-    if(metode === 'GOPAY'){
-        infoPembayaran = `Transfer ke GoPay: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><img src="gopay.jpg" style="width:200px; margin:auto; display:block;"><p>Scan QR GoPay di atas</p>`;
-    }
-    if(metode === 'MANDIRI'){
-        infoPembayaran = `Transfer ke Mandiri: 1270011397252 a/n Sabda Gusti Nang Wardoyo`;
-    }
+    <div class="info-pesanan" id="infoPesanan">
+        Memuat data pesanan...
+    </div>
 
-    document.getElementById('judul-modal').innerText = `Bayar via ${metode}`;
-    document.getElementById('isi-keranjang').innerHTML = `
-        <div style="text-align:center;">
-            <h2 style="color:#ff6b6b;">Rp ${total.toLocaleString('id-ID')}</h2>
-            <p>${infoPembayaran}</p>
-            <p style="font-size:14px; color:gray;">Setelah transfer, klik tombol di bawah untuk konfirmasi ke WA</p>
-        </div>`;
+    <form id="formBukti" class="form-bukti">
+        <div class="form-group">
+            <label>Nama Pemesan</label>
+            <input type="text" id="nama" placeholder="Nama lengkap kamu" required>
+        </div>
 
-    // SIMPAN KERANJANG KE localStorage SEBELUM PINDAH HALAMAN
-    localStorage.setItem('pesananSabda', JSON.stringify(keranjang));
-
-    document.getElementById('btn-aksi').style.display = 'block';
-    document.getElementById('btn-aksi').innerText = 'Konfirmasi via WhatsApp';
-    document.getElementById('btn-aksi').onclick = () => {
-        window.location.href = `bukti-pembayaran.html?metode=${metode}&total=${total}`;
-    };
-    document
+        <div class="form-group">
+            <label>No. WhatsApp
