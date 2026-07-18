@@ -1,148 +1,96 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Bukti Pembayaran - Sabda Cemilan</title>
+    <title>Bukti Bayar - Sabda Cemilan</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background: #f5f5f5; padding: 20px; }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-            color: white;
-            text-align: center;
-            padding: 25px 20px;
-        }
-        .header h2 { font-size: 22px; margin-bottom: 5px; }
-        .header p { font-size: 14px; opacity: 0.9; }
-
-        .info-pesanan {
-            background: #fff7ed;
-            margin: 15px;
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid #ff6b6b;
-        }
-        .info-pesanan h3 { color: #ff6b6b; margin-bottom: 10px; font-size: 16px; }
-        .info-pesanan p { margin: 5px 0; font-size: 14px; }
-        .list-produk {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-        .list-produk pre {
-            white-space: pre-wrap;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .form-bukti { padding: 20px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #333;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none;
-            border-color: #ff6b6b;
-        }
-        #preview {
-            max-width: 100%;
-            margin-top: 10px;
-            border-radius: 10px;
-            display: none;
-            border: 2px dashed #ddd;
-        }
-        .btn-kirim {
-            width: 100%;
-            padding: 14px;
-            background: #25D366;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-kirim:hover { background: #1ebe5b; transform: translateY(-2px); }
-        .note {
-            text-align: center;
-            font-size: 12px;
-            color: #777;
-            margin-top: 10px;
-        }
+        body { font-family: Poppins, sans-serif; background: #FFF8F0; padding: 20px; text-align: center; }
+      .box { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h2 { color: #FF6B35; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #FF6B35; color: white; font-weight: bold; border: none; cursor: pointer; }
+        button:hover { background: #e85a28; }
     </style>
 </head>
 <body>
+    <div class="box">
+        <h2>Kirim Bukti Pembayaran</h2>
+        <p>Setelah transfer, upload bukti di bawah ya 👇</p>
 
-<div class="container">
-    <div class="header">
-        <h2>📸 Upload Bukti Pembayaran</h2>
-        <p>Sabda Cemilan - Kripik & Jamu Herbal</p>
+        <!-- INI DITARO DI ATAS -->
+        <div id="info-bayar" style="background:#FFF8F0; padding:15px; border-radius:10px; margin-bottom:15px;"></div>
+
+        <form id="buktiForm">
+            <input type="text" id="nama" placeholder="Nama Pemesan" required>
+            <input type="text" id="kodePesanan" placeholder="NO HP" required>
+            <input type="file" id="buktiBayar" accept="image/*" required>
+            <button type="submit">Kirim ke Admin</button>
+        </form>
+        <p id="status"></p>
     </div>
-
-    <div class="info-pesanan" id="infoPesanan">
-        Memuat data pesanan...
-    </div>
-
-    <form id="formBukti" class="form-bukti">
-        <div class="form-group">
-            <label>Nama Pemesan *</label>
-            <input type="text" id="nama" placeholder="Contoh: Budi Santoso" required>
-        </div>
-
-        <div class="form-group">
-            <label>No. WhatsApp *</label>
-            <input type="tel" id="nohp" placeholder="Contoh: 08123456789" required>
-        </div>
-
-        <div class="form-group">
-            <label>Alamat Pengiriman *</label>
-            <textarea id="alamat" placeholder="Alamat lengkap + patokan" rows="3" required></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>Upload Bukti Transfer *</label>
-            <input type="file" id="bukti" accept="image/*" required>
-            <img id="preview" alt="Preview Bukti">
-        </div>
-
-        <div class="form-group">
-            <label>Catatan Tambahan</label>
-            <textarea id="catatan" placeholder="Contoh: Tolong kirim hari Sabtu" rows="2"></textarea>
-        </div>
-
-        <button type="submit" class="btn-kirim">Kirim ke Admin via WhatsApp</button>
-        <p class="note">Setelah klik, WA akan terbuka. Silakan lampirkan foto bukti transfer.</p>
-    </form>
-</div>
 
 <script>
-    const noAdmin = "628998628025"; // <-- GANTI DENGAN NOMOR WA KAMU
+// 1. Ambil data dari URL dulu
+const urlParams = new URLSearchParams(window.location.search);
+const metode = urlParams.get('metode');
+const total = urlParams.get('total');
 
-    // Ambil data dari URL dan localStorage
-    const urlParams = new URLSearchParams(window.location.search);
-    const metode = urlParams.get('metode') || '-';
-    const total = urlParams.get('total') || 0
+// 2. Tampilin di halaman
+document.getElementById('info-bayar').innerHTML = `
+    <p>Metode: <b>${metode}</b></p>
+    <p>Total Bayar: <b>Rp ${parseInt(total).toLocaleString('id-ID')}</b></p>
+`;
+
+document.getElementById('buktiForm').onsubmit = async function(e) {
+    e.preventDefault();
+    document.getElementById('status').innerText = "Mengirim...";
+
+    let nama = document.getElementById('nama').value;
+    let kode = document.getElementById('kodePesanan').value;
+    let file = document.getElementById('buktiBayar').files[0];
+
+    let formData = new FormData();
+    formData.append('target', '628998628025'); // INI NO WA KAMU. UDAH BENER
+    
+    // Pesan digabung sekalian sama metode + total
+    formData.append('message', `🔔 BUKTI BAYAR BARU
+Nama: ${nama}
+Kode: ${no}
+Metode: ${metode}
+Total: Rp ${parseInt(total).toLocaleString('id-ID')}`);
+Halo Admin Sabda Cemilan 💛
+Saya sudah bayar yaa...
+
+---
+Terima kasih sudah order di Sabda Cemilan! 
+Semoga keripiknya bikin nagih yaa 😋
+Reseller welcome loh kaa ✨
+    
+    formData.append('file', file);
+
+    // 3. WAJIB GANTI INI DENGAN TOKEN KAMU
+    let response = await fetch('https://api.fonnte.com/send', {
+    method: 'POST',
+    headers: { 'Authorization': 'ZqfkL2LdHfVoXa4K4cDN' }, // <-- GANTI JADI INI
+    body: formData
+});
+
+    if(response.ok) {
+        document.getElementById('status').innerText = "✅ Bukti berhasil terkirim! Admin akan segera konfirmasi";
+        document.getElementById('buktiForm').reset();
+    } else {
+        document.getElementById('status').innerText = "❌ Gagal kirim. Cek token Fonnte";
+    }
+}
+</script>
+</body>
+<div style="text-align:center; padding:30px; background:#FFF9E6; border-radius:15px; margin:20px auto; max-width:500px;">
+  <div style="font-size:50px;">🎉</div>
+  <h2 style="color:#FF6B00;">Makasih Banyak Kaa! 🙏</h2>
+  <p style="font-size:15px; color:#555;">
+     <br>
+    Pesanan Sabda Cemilan kamu akan kami kirim di <b>Sabtu/Minggu</b> <br><br>
+    Ditunggu yaa keripik renyahnya 🥳 <br>
+    Jangan lupa review setelah nyampe yaa
+  </p>
+</div>
+</html>
