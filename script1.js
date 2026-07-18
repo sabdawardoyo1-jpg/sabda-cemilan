@@ -58,3 +58,71 @@ function bukaKeranjang() {
             <button onclick="bayar('DANA')">💙 Bayar DANA</button>
             <button onclick="bayar('GOPAY')">💚 Bayar GoPay</button>
             <button onclick="bayar('MANDIRI')">💛 Bayar Mandiri</button>
+        </div>
+    `;
+    document.getElementById('btn-aksi').style.display = 'none';
+    document.getElementById('modal-keranjang').style.display = 'flex';
+}
+
+function updateKeranjang() {
+    let isi = document.getElementById('isi-keranjang');
+    let total = 0;
+    isi.innerHTML = '';
+    keranjang.forEach((item, index) => {
+        total += item.harga * item.jumlah;
+       isi.innerHTML += `
+        <div class="item-keranjang">
+            <div><b>${item.nama}</b><br>Rp ${item.harga.toLocaleString('id-ID')} x ${item.jumlah}</div>
+            <div>
+                <button class="qty-btn" onclick="kurangQty(${index})">-</button>
+                <button class="qty-btn" onclick="tambahQty(${index})">+</button>
+                <button class="qty-btn hapus" onclick="hapusItem(${index})">Hapus</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('total-harga').innerText = `Total: Rp ${total.toLocaleString('id-ID')}`;
+}
+
+function tambahQty(i){keranjang[i].jumlah++;bukaKeranjang();}
+function kurangQty(i){keranjang[i].jumlah>1?keranjang[i].jumlah--:keranjang.splice(i,1);bukaKeranjang();}
+function hapusItem(i){keranjang.splice(i,1);bukaKeranjang();}
+function tutupKeranjang(){document.getElementById('modal-keranjang').style.display='none';}
+
+function bayar(metode) {
+    let total = keranjang.reduce((sum, item) => sum + item.harga * item.jumlah, 0);
+    let infoPembayaran = "";
+
+    if(metode === 'DANA'){
+        infoPembayaran = `Transfer ke DANA: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><img src="dana.jpg" style="width:200px; margin:auto; display:block;"><p>Scan QR DANA di atas</p>`;
+    }
+    if(metode === 'GOPAY'){
+        infoPembayaran = `Transfer ke GoPay: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><img src="gopay.jpg" style="width:200px; margin:auto; display:block;"><p>Scan QR GoPay di atas</p>`;
+    }
+    if(metode === 'MANDIRI'){
+        infoPembayaran = `Transfer ke Mandiri: 1270011397252 a/n Sabda Gusti Nang Wardoyo`;
+    }
+
+    document.getElementById('judul-modal').innerText = `Bayar via ${metode}`;
+    document.getElementById('isi-keranjang').innerHTML = `
+        <div style="text-align:center;">
+            <h2 style="color:#ff6b6b;">Rp ${total.toLocaleString('id-ID')}</h2>
+            <p>${infoPembayaran}</p>
+            <p style="font-size:14px; color:gray;">Setelah transfer, klik tombol di bawah untuk konfirmasi ke WA</p>
+        </div>`;
+
+    // SIMPAN DATA KERANJANG BIAR BISA DIBACA DI HALAMAN BUKTI
+    localStorage.setItem('pesananSabda', JSON.stringify(keranjang));
+
+    document.getElementById('btn-aksi').style.display = 'block';
+    document.getElementById('btn-aksi').innerText = 'Konfirmasi via WhatsApp';
+    // PINDAH KE HALAMAN BUKTI BUKAN LANGSUNG WA
+    document.getElementById('btn-aksi').onclick = () => {
+        window.location.href = `bukti-pembayaran.html?metode=${metode}&total=${total}`;
+    };
+    document.getElementById('total-harga').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    let modal = document.getElementById('modal-keranjang');
+    if (event.target == modal) { modal.style.display = 'none'; }
+}
