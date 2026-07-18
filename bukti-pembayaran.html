@@ -1,90 +1,31 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Bukti Pembayaran - Sabda Cemilan</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-       .container { max-width: 500px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-       .container h2 { text-align: center; color: #ff6b6b; }
-       .info-bayar { background: #fff7ed; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; }
-        input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        button { background: #25D366; color: white; font-weight: bold; border: none; cursor: pointer; }
-        button:hover { background: #1ebe5b; }
-        #preview { max-width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
-    </style>
-</head>
-<body style="background:#fefefe;">
+function bayar(metode) {
+    let total = keranjang.reduce((sum, item) => sum + item.harga * item.jumlah, 0);
+    let infoPembayaran = "";
 
-<div class="container">
-    <h2>📸 Upload Bukti Pembayaran</h2>
-
-    <div class="info-bayar" id="infoPesanan">
-        <!-- Data pesanan akan muncul otomatis dari URL -->
-    </div>
-
-    <form id="formBukti">
-        <label>Nama Pemesan:</label>
-        <input type="text" id="nama" placeholder="Nama lengkap kamu" required>
-
-        <label>No. WhatsApp:</label>
-        <input type="tel" id="nohp" placeholder="08xxxxxxxxxx" required>
-
-        <label>Upload Bukti Transfer:</label>
-        <input type="file" id="bukti" accept="image/*" required>
-        <img id="preview" alt="Preview Bukti">
-
-        <label>Catatan:</label>
-        <textarea id="catatan" placeholder="Alamat lengkap untuk pengiriman"></textarea>
-
-        <button type="submit">Kirim ke Admin via WhatsApp</button>
-    </form>
-</div>
-
-<script>
-    // Ambil data dari URL:?metode=DANA&total=50000
-    const urlParams = new URLSearchParams(window.location.search);
-    const metode = urlParams.get('metode');
-    const total = urlParams.get('total');
-
-    document.getElementById('infoPesanan').innerHTML = `
-        <b>Metode:</b> ${metode} <br>
-        <b>Total Bayar:</b> Rp ${Number(total).toLocaleString('id-ID')}
-    `;
-
-    // Preview gambar
-    document.getElementById('bukti').onchange = function(e){
-        let reader = new FileReader();
-        reader.onload = function(event){
-            document.getElementById('preview').src = event.target.result;
-            document.getElementById('preview').style.display = 'block';
-        }
-        reader.readAsDataURL(e.target.files[0]);
+    if(metode === 'DANA'){
+        infoPembayaran = `Transfer ke DANA: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><img src="dana.jpg" style="width:200px; margin:auto; display:block;"><p>Scan QR DANA di atas</p>`;
+    }
+    if(metode === 'GOPAY'){
+        infoPembayaran = `Transfer ke GoPay: 08998628025 a/n Sabda Gusti Nang Wardoyo<br><img src="gopay.jpg" style="width:200px; margin:auto; display:block;"><p>Scan QR GoPay di atas</p>`;
+    }
+    if(metode === 'MANDIRI'){
+        infoPembayaran = `Transfer ke Mandiri: 1270011397252 a/n Sabda Gusti Nang Wardoyo`;
     }
 
-    // Kirim ke WA
-    document.getElementById('formBukti').onsubmit = function(e){
-        e.preventDefault();
-        const noAdmin = "628998628025"; // GANTI NOMOR ADMIN KAMU
-        const nama = document.getElementById('nama').value;
-        const nohp = document.getElementById('nohp').value;
-        const catatan = document.getElementById('catatan').value;
+    document.getElementById('judul-modal').innerText = `Bayar via ${metode}`;
+    document.getElementById('isi-keranjang').innerHTML = `
+        <div style="text-align:center;">
+            <h2 style="color:#ff6b6b;">Rp ${total.toLocaleString('id-ID')}</h2>
+            <p>${infoPembayaran}</p>
+            <p style="font-size:14px; color:gray;">Setelah transfer, klik tombol di bawah untuk konfirmasi ke WA</p>
+        </div>`;
 
-        let pesan = `Halo Admin Sabda Cemilan 👋\n\n`;
-        pesan += `*KONFIRMASI PEMBAYARAN*\n\n`;
-        pesan += `Nama: ${nama}\n`;
-        pesan += `No HP: ${nohp}\n`;
-        pesan += `Metode: ${metode}\n`;
-        pesan += `Total: Rp ${Number(total).toLocaleString('id-ID')}\n`;
-        pesan += `Catatan/Alamat: ${catatan}\n\n`;
-        pesan += `Bukti transfer sudah saya upload. Mohon dicek ya 🙏`;
+    // SIMPAN KERANJANG KE localStorage SEBELUM PINDAH HALAMAN
+    localStorage.setItem('pesananSabda', JSON.stringify(keranjang));
 
-        let url = `https://wa.me/${noAdmin}?text=${encodeURIComponent(pesan)}`;
-        window.open(url, '_blank');
-        alert('Terima kasih! Setelah ini silakan kirim foto bukti transfer secara manual di WA yang terbuka.');
-    }
-</script>
-
-</body>
-</html>
+    document.getElementById('btn-aksi').style.display = 'block';
+    document.getElementById('btn-aksi').innerText = 'Konfirmasi via WhatsApp';
+    document.getElementById('btn-aksi').onclick = () => {
+        window.location.href = `bukti-pembayaran.html?metode=${metode}&total=${total}`;
+    };
+    document
