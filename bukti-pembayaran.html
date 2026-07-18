@@ -1,96 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Bukti Bayar - Sabda Cemilan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Bukti Pembayaran - Sabda Cemilan</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        body { font-family: Poppins, sans-serif; background: #FFF8F0; padding: 20px; text-align: center; }
-      .box { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        h2 { color: #FF6B35; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { background: #FF6B35; color: white; font-weight: bold; border: none; cursor: pointer; }
-        button:hover { background: #e85a28; }
+       .container { max-width: 500px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+       .container h2 { text-align: center; color: #ff6b6b; }
+       .info-bayar { background: #fff7ed; padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 14px; }
+        input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        button { background: #25D366; color: white; font-weight: bold; border: none; cursor: pointer; }
+        button:hover { background: #1ebe5b; }
+        #preview { max-width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
     </style>
 </head>
-<body>
-    <div class="box">
-        <h2>Kirim Bukti Pembayaran</h2>
-        <p>Setelah transfer, upload bukti di bawah ya 👇</p>
+<body style="background:#fefefe;">
 
-        <!-- INI DITARO DI ATAS -->
-        <div id="info-bayar" style="background:#FFF8F0; padding:15px; border-radius:10px; margin-bottom:15px;"></div>
+<div class="container">
+    <h2>📸 Upload Bukti Pembayaran</h2>
 
-        <form id="buktiForm">
-            <input type="text" id="nama" placeholder="Nama Pemesan" required>
-            <input type="text" id="kodePesanan" placeholder="NO HP" required>
-            <input type="file" id="buktiBayar" accept="image/*" required>
-            <button type="submit">Kirim ke Admin</button>
-        </form>
-        <p id="status"></p>
+    <div class="info-bayar" id="infoPesanan">
+        <!-- Data pesanan akan muncul otomatis dari URL -->
     </div>
 
-<script>
-// 1. Ambil data dari URL dulu
-const urlParams = new URLSearchParams(window.location.search);
-const metode = urlParams.get('metode');
-const total = urlParams.get('total');
+    <form id="formBukti">
+        <label>Nama Pemesan:</label>
+        <input type="text" id="nama" placeholder="Nama lengkap kamu" required>
 
-// 2. Tampilin di halaman
-document.getElementById('info-bayar').innerHTML = `
-    <p>Metode: <b>${metode}</b></p>
-    <p>Total Bayar: <b>Rp ${parseInt(total).toLocaleString('id-ID')}</b></p>
-`;
+        <label>No. WhatsApp:</label>
+        <input type="tel" id="nohp" placeholder="08xxxxxxxxxx" required>
 
-document.getElementById('buktiForm').onsubmit = async function(e) {
-    e.preventDefault();
-    document.getElementById('status').innerText = "Mengirim...";
+        <label>Upload Bukti Transfer:</label>
+        <input type="file" id="bukti" accept="image/*" required>
+        <img id="preview" alt="Preview Bukti">
 
-    let nama = document.getElementById('nama').value;
-    let kode = document.getElementById('kodePesanan').value;
-    let file = document.getElementById('buktiBayar').files[0];
+        <label>Catatan:</label>
+        <textarea id="catatan" placeholder="Alamat lengkap untuk pengiriman"></textarea>
 
-    let formData = new FormData();
-    formData.append('target', '628998628025'); // INI NO WA KAMU. UDAH BENER
-    
-    // Pesan digabung sekalian sama metode + total
-    formData.append('message', `🔔 BUKTI BAYAR BARU
-Nama: ${nama}
-Kode: ${no}
-Metode: ${metode}
-Total: Rp ${parseInt(total).toLocaleString('id-ID')}`);
-Halo Admin Sabda Cemilan 💛
-Saya sudah bayar yaa...
-
----
-Terima kasih sudah order di Sabda Cemilan! 
-Semoga keripiknya bikin nagih yaa 😋
-Reseller welcome loh kaa ✨
-    
-    formData.append('file', file);
-
-    // 3. WAJIB GANTI INI DENGAN TOKEN KAMU
-    let response = await fetch('https://api.fonnte.com/send', {
-    method: 'POST',
-    headers: { 'Authorization': 'ZqfkL2LdHfVoXa4K4cDN' }, // <-- GANTI JADI INI
-    body: formData
-});
-
-    if(response.ok) {
-        document.getElementById('status').innerText = "✅ Bukti berhasil terkirim! Admin akan segera konfirmasi";
-        document.getElementById('buktiForm').reset();
-    } else {
-        document.getElementById('status').innerText = "❌ Gagal kirim. Cek token Fonnte";
-    }
-}
-</script>
-</body>
-<div style="text-align:center; padding:30px; background:#FFF9E6; border-radius:15px; margin:20px auto; max-width:500px;">
-  <div style="font-size:50px;">🎉</div>
-  <h2 style="color:#FF6B00;">Makasih Banyak Kaa! 🙏</h2>
-  <p style="font-size:15px; color:#555;">
-     <br>
-    Pesanan Sabda Cemilan kamu akan kami kirim di <b>Sabtu/Minggu</b> <br><br>
-    Ditunggu yaa keripik renyahnya 🥳 <br>
-    Jangan lupa review setelah nyampe yaa
-  </p>
+        <button type="submit">Kirim ke Admin via WhatsApp</button>
+    </form>
 </div>
+
+<script>
+    // Ambil data dari URL:?metode=DANA&total=50000
+    const urlParams = new URLSearchParams(window.location.search);
+    const metode = urlParams.get('metode');
+    const total = urlParams.get('total');
+
+    document.getElementById('infoPesanan').innerHTML = `
+        <b>Metode:</b> ${metode} <br>
+        <b>Total Bayar:</b> Rp ${Number(total).toLocaleString('id-ID')}
+    `;
+
+    // Preview gambar
+    document.getElementById('bukti').onchange = function(e){
+        let reader = new FileReader();
+        reader.onload = function(event){
+            document.getElementById('preview').src = event.target.result;
+            document.getElementById('preview').style.display = 'block';
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    // Kirim ke WA
+    document.getElementById('formBukti').onsubmit = function(e){
+        e.preventDefault();
+        const noAdmin = "628998628025"; // GANTI NOMOR ADMIN KAMU
+        const nama = document.getElementById('nama').value;
+        const nohp = document.getElementById('nohp').value;
+        const catatan = document.getElementById('catatan').value;
+
+        let pesan = `Halo Admin Sabda Cemilan 👋\n\n`;
+        pesan += `*KONFIRMASI PEMBAYARAN*\n\n`;
+        pesan += `Nama: ${nama}\n`;
+        pesan += `No HP: ${nohp}\n`;
+        pesan += `Metode: ${metode}\n`;
+        pesan += `Total: Rp ${Number(total).toLocaleString('id-ID')}\n`;
+        pesan += `Catatan/Alamat: ${catatan}\n\n`;
+        pesan += `Bukti transfer sudah saya upload. Mohon dicek ya 🙏`;
+
+        let url = `https://wa.me/${noAdmin}?text=${encodeURIComponent(pesan)}`;
+        window.open(url, '_blank');
+        alert('Terima kasih! Setelah ini silakan kirim foto bukti transfer secara manual di WA yang terbuka.');
+    }
+</script>
+
+</body>
 </html>
