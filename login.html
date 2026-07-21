@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login PKA UMKM</title>
+  <style>
+    body {display: flex; justify-content: center; align-items: center; height: 100vh; background: #ff6b81;}
+   .box {background: white; padding: 30px; border-radius: 12px; text-align: center;}
+    input, button {padding: 10px; width: 100%; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc;}
+    button {background: #ff6b81; color: white; border: none; cursor: pointer;}
+  </style>
+</head>
+<body>
+ <div class="box">
+   <h2>Login PKA UMKM</h2>
+   <input type="password" id="pass" placeholder="Masukkan Password">
+   <button onclick="cekPassword()">Masuk</button>
+ </div>
+
+<script>
+function cekPassword() {
+  let passwordBenar = "sabda2026";
+  let input = document.getElementById("pass").value;
+  
+  if (input === passwordBenar) {
+    // Kalau benar, masuk ke halaman utama
+    window.location.href = "home.html"; 
+  } else {
+    alert("Password Salah!");
+  }
+}
+</script>
+</body>
+</html>
