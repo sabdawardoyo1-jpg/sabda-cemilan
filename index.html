@@ -1,5 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+    <script>
+  // Ganti password nya disini
+  let passwordBenar = "sabda2026"; 
+
+  let input = prompt("Masukkan Password untuk masuk ke PKA UMKM:");
+  
+  if (input !== passwordBenar) {
+    alert("Password Salah! Akses ditolak.");
+    // Biar gabisa masuk, kita kosongin halamannya
+    document.body.innerHTML = "<h1 style='text-align:center; margin-top:100px;'>Akses Ditolak</h1>";
+    // atau bisa alihkan: window.location.href = "https://google.com";
+  }
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
