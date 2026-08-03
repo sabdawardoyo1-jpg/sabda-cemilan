@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin PKA UMKM</title>
+<style>
+body{font-family:Segoe UI;background:#fff8f0;padding:20px;max-width:600px;margin:auto}
+.card{background:white;padding:20px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+input,textarea{width:95%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px}
+button{background:#d97706;color:white;border:none;padding:14px;width:100%;border-radius:8px;font-weight:bold;cursor:pointer}
+button:hover{background:#b45309}
+table{width:100%;margin-top:20px;border-collapse:collapse} td,th{border:1px solid #ddd;padding:8px;font-size:12px}
+img{width:40px;height:40px;object-fit:cover;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>📦 Admin PKA UMKM</h2>
+  <input id="nama" placeholder="Nama Produk: Kripik Singkong 1kg">
+  <input id="harga" type="number" placeholder="Harga: 40000">
+  <input id="foto" placeholder="Link Foto Google Drive: https://drive.google.com/...">
+  <input id="wa" placeholder="No WA Admin" value="08998628025">
+  <textarea id="deskripsi" placeholder="Deskripsi produk"></textarea>
+  <button onclick="simpanProduk()">Simpan Produk</button>
+  <p id="status"></p>
+</div>
+
+<h3>Data Produk Saat Ini</h3>
+<table id="tabel-produk"><tr><th>Foto</th><th>Nama</th><th>Harga</th></tr></table>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwhVayTVApUudskuPSfwApZmUxgGQvD9xJ8fdNXoSlRMIIq5VB0OyCCX4vwVnKyzMds0A/exec";
+
+function simpanProduk(){
+  status.innerText = "Menyimpan...";
+  const data = {
+    nama:nama.value,harga:harga.value,foto:foto.value,wa:wa.value,deskripsi:deskripsi.value
+  };
+  fetch(SCRIPT_URL, {method:'POST', body:JSON.stringify(data)})
+.then(res => res.json())
+.then(res => {
+    status.innerText = "✅ Berhasil disimpan!"; 
+    nama.value="";harga.value="";foto.value="";deskripsi.value=""; 
+    loadData();
+  }).catch(err => status.innerText = "❌ Gagal: " + err);
+}
+
+function loadData(){
+  fetch(SCRIPT_URL).then(res => res.json()).then(data => {
+    let html = "<tr><th>Foto</th><th>Nama</th><th>Harga</th></tr>";
+    data.forEach(p => { 
+      html += `<tr>
+        <td><img src="${p.foto}"></td>
+        <td>${p.nama}</td>
+        <td>Rp ${Number(p.harga).toLocaleString('id-ID')}</td>
+      </tr>`; 
+    });
+    document.getElementById('tabel-produk').innerHTML = html;
+  });
+}
+loadData();
+</script>
+</body>
+</html>
