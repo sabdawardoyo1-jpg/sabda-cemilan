@@ -1,128 +1,89 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PKA UMKM</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PKA UMKM - Produk Unggulan</title>
+<style>
+body{font-family:Segoe UI;background:#fff8f0;margin:0;padding:0}
+.header{background:#d97706;color:white;text-align:center;padding:20px}
+.header h1{margin:0;font-size:24px}
+.container{padding:20px;max-width:1200px;margin:auto}
+#list-produk{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.produk-card{background:white;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);padding:12px;text-align:center}
+.produk-card img{width:100%;height:200px;object-fit:cover;border-radius:8px}
+.produk-card h3{font-size:16px;margin:10px 0 5px;color:#333}
+.harga{color:#d97706;font-weight:bold;font-size:18px;margin:5px 0 10px}
+.btn-card-group{display:flex;gap:8px}
+.btn-card-group a, .btn-card-group button{flex:1;border:none;padding:10px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;text-align:center}
+.btn-card-group a{background:#f0f0f0;color:#333}
+.btn-card-group button{background:#d97706;color:white}
+.btn-card-group button:hover{background:#b45309}
+.loading{text-align:center;padding:40px;font-size:18px;color:#666}
+</style>
 </head>
-<header>
-    <h1>PKA UMKM</h1>
-    <div class="keranjang-icon" onclick="bukaKeranjang()">🛒 <span id="jumlah-keranjang">0</span></div>
-</header>
-
-
-<!-- TAMBAHKAN INI -->
-<!-- <section class="banner-salam">
-    <h2>Selamat Datang di PKA UMKM</h2>
-    <p></p>
-</section> -->
-<section class="banner-salam">
-    <h2>Info yang sangat penting</h2>
-    <p>kami hanya mengirim pesanan di hari sabtu minggu</p>
-</section>
-
-<main class="produk-container">
 <body>
-    <!-- <header>
-        <h1>sabda kue</h1>
-        <div class="keranjang-icon" onclick="bukaKeranjang()">🛒 <span id="jumlah-keranjang">0</span></div>
-    </header> -->
 
-    <main class="produk-container">
-       
-        <div class="produk-card">
-            <img src="kripiksingkong.jpg" alt="kripik singkong 2kg">
-            <h3>kripik singkong 2kg</h3>
-            <p class="harga">Rp 72.000</p>
-            <button onclick="tambahKeKeranjang(1, 'kripik singkong 2kg', 72000)">Beli Sekarang</button>
-        </div>
-        <div class="produk-card">
-            <img src="kripiksingkong.jpg" alt="kripik singkong 1kg">
-            <h3>kripik singkong 1kg</h3>
-            <p class="harga">Rp 40.000</p>
-            <button onclick="tambahKeKeranjang(1, 'kripik singkong 1kg', 40000)">Beli Sekarang</button>
-        </div>
-        <div class="produk-card">
-            <img src="kripiksingkong.jpg" alt="kripik singkong 500gram">
-            <h3>kripik singkong 500gram</h3>
-            <p class="harga">Rp 25.000</p>
-           <button onclick="tambahKeKeranjang(2, 'kripik singkong 500gram', 25000)">Beli Sekarang</button>
-        </div>
-        <div class="produk-card">
-            <img src="kripiksingkong.jpg" alt="kripik singkong 250gram">
-            <h3>kripik singkong 250gram</h3>
-            <p class="harga">Rp 15.000</p>
-            <button onclick="tambahKeKeranjang(3, 'kripik singkong 250gram', 15000)">Beli Sekarang</button>
-        </div>
-   
-        <div class="produk-card">
-            <img src="jamu.jpg" alt="kripik singkong 250gram">
-            <h3>jamu yunus rasa kunyit asem</h3>
-            <p class="harga">Rp 10.000</p>
-            <button onclick="tambahKeKeranjang(3, 'jamu kunyit asam', 10000)">Beli Sekarang</button>
-        </div>
-        <div class="produk-card">
-            <img src="jamu.jpg" alt="kripik singkong 250gram">
-            <h3>jamu yunus rasa jahe merah</h3>
-            <p class="harga">Rp 10.000</p>
-            <button onclick="tambahKeKeranjang(3, 'jamu rasa jahe merah', 10000)">Beli Sekarang</button>
-        </div>
-        <div class="produk-card">
-            <img src="jamu.jpg" alt="kripik singkong 250gram">
-            <h3>jamu yunus campur</h3>
-            <p class="harga">Rp 10.000</p>
-            <button onclick="tambahKeKeranjang(3, 'jamu campur', 10000)">Beli Sekarang</button>
-        </div>
-        </div>
-        <div class="produk-card">
-            <img src="bawanggoreng.png" alt="kripik singkong 250gram">
-            <h3>Bawang goreng (Bu diah) </h3>
-            <p class="harga">Rp 65.000</p>
-            <button onclick="tambahKeKeranjang(3, 'bawang goreng', 60000)">Beli Sekarang</button>
-        </div>
-    </main>
-
-    <!-- MODAL KERANJANG -->
-    <div id="modal-keranjang" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="tutupKeranjang()">&times;</span>
-            <h2 id="judul-modal">Keranjang Belanja</h2>
-            <div id="isi-keranjang"></div>
-            <h3 id="total-harga">Total: Rp 0</h3>
-            <div class="popup">
-  
-  
-  
-  <!-- TARUH DESKRIPSI DI SINI -->
-  <!-- <div style="background:#fff7ed; padding:12px; border-radius:8px; margin:10px 0; font-size:13px;">
-    <b>🌿 Manfaat Jamu Jahe Merah:</b>
-    <ul style="margin:5px 0; padding-left:18px;">
-      <li>Menghangatkan badan & melancarkan peredaran darah</li>
-      <li>Meredakan masuk angin, batuk, dan flu</li>
-      <li>Meningkatkan stamina tubuh</li>
-      <li>100% alami tanpa pengawet</li>
-    </ul>
-    <p style="font-size:11px; color:#777;">Anjuran: Minum 1 botol per hari, hangat lebih nikmat</p>
-  </div> -->
-  <!-- SELESAI DESKRIPSI -->
-
-  <!-- <div> - 1 + </div> -->
-  <!-- <button>Tambah ke Keranjang</button> -->
+<div class="header">
+  <h1>PKA UMKM</h1>
+  <p>Produk Unggulan UMKM Nusantara</p>
 </div>
-            <!-- Tombol aksi & Metode bayar akan dimunculkan lewat JS -->
-            <button id="btn-aksi" style="display:none; width:100%; margin-top:10px;"></button>
-        </div> <!-- INI TADI KURANG -->
-    </div> <!-- INI JUGA KURANG -->
 
+<div class="container">
+  <h2>Semua Produk</h2>
+  <div id="list-produk" class="loading">Memuat produk...</div>
+</div>
 
+<script>
+// INI DATA DARI GOOGLE SHEET KAMU
+const SHEET_ID = "AKfycbz7MBYjcFTCgE-SpUq8heHcgSq2DcZlNnR1ashj-uRUje_NQQ3UR6K1MoTTGeAJqph7ug";
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-    <script src="script1.js"></script>
-   
-   
+fetch(SHEET_URL)
+.then(res => res.text())
+.then(rep => {
+    const json = JSON.parse(rep.substr(47).slice(0,-2));
+    const produk = json.table.rows;
+    let html = "";
+    
+    if(produk.length === 0){
+      html = "<p>Belum ada produk. Silahkan tambah di halaman admin.html</p>";
+    } else {
+      produk.forEach((p,i) => {
+          if(!p.c[0]) return; // skip baris kosong
+          const nama = p.c[0].v;
+          const harga = p.c[1].v;
+          const foto = p.c[2].v;
+          const deskripsi = p.c[4] ? p.c[4].v : "";
+          const id = i+1; // ID berdasarkan urutan baris
+          
+          html += `<div class="produk-card">
+              <img src="${foto}" alt="${nama}" onclick="location.href='detail-produk.html?id=${id}'" style="cursor:pointer;">
+              <h3 onclick="location.href='detail-produk.html?id=${id}'" style="cursor:pointer;">${nama}</h3>
+              <p class="harga">Rp ${Number(harga).toLocaleString('id-ID')}</p>
+              <div class="btn-card-group">
+                  <a href="detail-produk.html?id=${id}">Detail</a>
+                  <button onclick="tambahKeKeranjang(${id}, '${nama}', ${harga})">Beli</button>
+              </div>
+          </div>`;
+      });
+    }
+    document.getElementById('list-produk').innerHTML = html;
+})
+.catch(err => {
+  document.getElementById('list-produk').innerHTML = "<p>❌ Gagal memuat produk. Cek koneksi & pastikan Sheet di 'Publikasikan ke web'</p>";
+  console.log(err)
+});
+
+// FUNGSI KERANJANG SEDERHANA
+let keranjang = JSON.parse(localStorage.getItem('keranjang')) || [];
+function tambahKeKeranjang(id, nama, harga){
+  keranjang.push({id, nama, harga, qty:1});
+  localStorage.setItem('keranjang', JSON.stringify(keranjang));
+  alert(nama + " ditambahkan ke keranjang!");
+  // nanti bisa diarahkan ke halaman checkout
+}
+</script>
+
 </body>
-
-<!-- <div class="perhatian">
-⚠️ <b>Perhatian:</b> Pengiriman hanya dilakukan 2x dalam seminggu, yaitu <b>Sabtu & Minggu</b>
-</div> -->
 </html>
