@@ -35,8 +35,8 @@ body{font-family:Segoe UI;background:#fff8f0;margin:0;padding:0}
 </div>
 
 <script>
-// INI DATA DARI GOOGLE SHEET KAMU
-const SHEET_ID = "AKfycbz7MBYjcFTCgE-SpUq8heHcgSq2DcZlNnR1ashj-uRUje_NQQ3UR6K1MoTTGeAJqph7ug";
+// INI DATA DARI GOOGLE SHEET KAMU - SUDAH DIGANTI
+const SHEET_ID = "2PACX-1vQtQBjX-ELS_mAyb6lZngy9ygDvW5bmlRYi1y8oa277BpHXojZojupZK4bgbjuEaKwwVaOTcgCSZxp";
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
 fetch(SHEET_URL)
@@ -81,7 +81,6 @@ function tambahKeKeranjang(id, nama, harga){
   keranjang.push({id, nama, harga, qty:1});
   localStorage.setItem('keranjang', JSON.stringify(keranjang));
   alert(nama + " ditambahkan ke keranjang!");
-  // nanti bisa diarahkan ke halaman checkout
 }
 </script>
 
