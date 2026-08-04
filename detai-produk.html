@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detail Produk - PKA UMKM</title>
+<style>
+body{font-family:Segoe UI;background:#fff8f0;margin:0;padding:0;color:#333}
+header{background:linear-gradient(135deg,#d97706,#f59e0b);color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;font-size:20px}
+.keranjang-icon{position:relative;cursor:pointer;font-size:24px}
+#jumlah-keranjang{background:red;border-radius:50%;padding:2px 6px;font-size:12px;position:absolute;top:-5px;right:-10px}
+.container{max-width:1000px;margin:20px auto;padding:20px;background:white;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
+.btn-kembali{display:inline-block;margin-bottom:20px;color:#d97706;text-decoration:none;font-weight:bold}
+.product-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.product-image-gallery img{width:100%;border-radius:12px}
+.product-title{font-size:28px;margin:0}
+.current-price{font-size:24px;color:#d97706;font-weight:bold;margin:10px 0}
+.btn-buy-now,.btn-wa-ask{display:block;width:100%;padding:14px;text-align:center;border:none;border-radius:8px;font-weight:bold;margin-top:10px;cursor:pointer;text-decoration:none}
+.btn-buy-now{background:#d97706;color:white}
+.btn-wa-ask{background:#25D366;color:white}
+@media(max-width:768px){.product-detail-grid{grid-template-columns:1fr}}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
+.modal-content{background:white;margin:10% auto;padding:20px;border-radius:12px;width:90%;max-width:500px}
+.close{float:right;font-size:28px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <h1>PKA UMKM</h1>
+  <div class="keranjang-icon" onclick="bukaKeranjang()">🛒 <span id="jumlah-keranjang">0</span></div>
+</header>
+
+<div class="container">
+  <a href="home.html" class="btn-kembali">⬅ Kembali ke Katalog</a>
+  <div id="detail-wrapper">Memuat detail produk...</div>
+</div>
+
+<div id="modal-keranjang" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="tutupKeranjang()">&times;</span>
+    <h2 id="judul-modal">Keranjang</h2>
+    <div id="isi-keranjang"></div>
+    <h3 id="total-harga"></h3>
+    <button id="btn-aksi"></button>
+  </div>
+</div>
+
+<script src="script1.js"></script>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmu_GRCGWjOCyDPMjZCP1VI41O9aON3etuiLSL9ITBs9hR-wQHeyExANrUlQ_pNzwP/exec";
+let produkAktif = null;
+
+function loadDetail(){
+  const id = new URLSearchParams(window.location.search).get('id');
+  if(!id) { document.getElementById('detail-wrapper').innerHTML="<h2>ID Produk tidak ada</h2>"; return; }
+  const s = document.createElement('script');
+  s.src = SCRIPT_URL + "?callback=renderDetail";
+  document.body.appendChild(s);
+}
+
+function renderDetail(data){
+  const id = new URLSearchParams(window.location.search).get('id');
+  produkAktif = data.find(p => p.id == id);
+  if(!produkAktif){ document.getElementById('detail-wrapper').innerHTML="<h2>Produk tidak ditemukan</h2>"; return; }
+
+  document.title = produkAktif.nama + " - PKA UMKM";
+  document.getElementById('detail-wrapper').innerHTML = `
+  <div class="product-detail-grid">
+    <div class="product-image-gallery">
+      <img src="${produkAktif.foto}" onerror="this.src='https://via.placeholder.com/400'">
+    </div>
+    <div class="product-info">
+      <h1 class="product-title">${produkAktif.nama}</h1>
+      <div class="current-price">Rp ${Number(produkAktif.harga).toLocaleString('id-ID')}</div>
+      <p style="line-height:1.7;margin:20px 0">${produkAktif.deskripsi}</p>
+      <button class="btn-buy-now" onclick="tambahKeKeranjang(${produkAktif.id}, '${produkAktif.nama}', ${produkAktif.harga})">🛒 Tambah Keranjang</button>
+      <a href="https://wa.me/${produkAktif.wa}?text=Halo%20saya%20mau%20tanya%20produk%20${produkAktif.nama}" target="_blank" class="btn-wa-ask">💬 Tanya via WhatsApp</a>
+    </div>
+  </div>`;
+  updateKeranjangIcon();
+}
+loadDetail();
+</script>
+</body>
+</html>
