@@ -3,86 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PKA UMKM - Produk Unggulan</title>
-<style>
-body{font-family:Segoe UI;background:#fff8f0;margin:0;padding:0}
-.header{background:#d97706;color:white;text-align:center;padding:20px}
-.header h1{margin:0;font-size:24px}
-.container{padding:20px;max-width:1200px;margin:auto}
-#list-produk{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
-.produk-card{background:white;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.08);padding:12px;text-align:center}
-.produk-card img{width:100%;height:200px;object-fit:cover;border-radius:8px}
-.produk-card h3{font-size:16px;margin:10px 0 5px;color:#333}
-.harga{color:#d97706;font-weight:bold;font-size:18px;margin:5px 0 10px}
-.btn-card-group{display:flex;gap:8px}
-.btn-card-group a, .btn-card-group button{flex:1;border:none;padding:10px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;text-align:center}
-.btn-card-group a{background:#f0f0f0;color:#333}
-.btn-card-group button{background:#d97706;color:white}
-.btn-card-group button:hover{background:#b45309}
-.loading{text-align:center;padding:40px;font-size:18px;color:#666}
-</style>
+<title>PKA UMKM</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header>
+    <h1>PKA UMKM</h1>
+    <div class="keranjang-icon" onclick="bukaKeranjang()">🛒 <span id="jumlah-keranjang">0</span></div>
+</header>
 
-<div class="header">
-  <h1>PKA UMKM</h1>
-  <p>Produk Unggulan UMKM Nusantara</p>
-</div>
+<section class="banner-salam">
+    <h2>Info penting</h2>
+    <p>kami hanya mengirim pesanan di hari sabtu minggu</p>
+</section>
 
-<div class="container">
-  <h2>Semua Produk</h2>
-  <div id="list-produk" class="loading">Memuat produk...</div>
+    <main class="produk-container" id="produk-container">
+        Memuat produk...
+    </main>
+
+<!-- MODAL KERANJANG -->
+<div id="modal-keranjang" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="tutupKeranjang()">&times;</span>
+        <h2>Keranjang Belanja</h2>
+        <div id="isi-keranjang"></div>
+        <h3 id="total-harga">Total: Rp 0</h3>
+        <button id="btn-aksi" onclick="checkoutWA()">Checkout via WA</button>
+    </div>
 </div>
 
 <script>
-// INI DATA DARI GOOGLE SHEET KAMU - SUDAH DIGANTI
-const SHEET_ID = "2PACX-1vQtQBjX-ELS_mAyb6lZngy9ygDvW5bmlRYi1y8oa277BpHXojZojupZK4bgbjuEaKwwVaOTcgCSZxp";
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmu_GRCGWjOCyDPMjZCP1VI41O9aON3etuiLSL9ITBs9hR-wQHeyExANrUlQ_pNzwP/exec"; 
+let daftarProduk = [];
+let keranjang = JSON.parse(localStorage.getItem('keranjangPKA')) || [];
 
-fetch(SHEET_URL)
-.then(res => res.text())
-.then(rep => {
-    const json = JSON.parse(rep.substr(47).slice(0,-2));
-    const produk = json.table.rows;
-    let html = "";
-    
-    if(produk.length === 0){
-      html = "<p>Belum ada produk. Silahkan tambah di halaman admin.html</p>";
-    } else {
-      produk.forEach((p,i) => {
-          if(!p.c[0]) return; // skip baris kosong
-          const nama = p.c[0].v;
-          const harga = p.c[1].v;
-          const foto = p.c[2].v;
-          const deskripsi = p.c[4] ? p.c[4].v : "";
-          const id = i+1; // ID berdasarkan urutan baris
-          
-          html += `<div class="produk-card">
-              <img src="${foto}" alt="${nama}" onclick="location.href='detail-produk.html?id=${id}'" style="cursor:pointer;">
-              <h3 onclick="location.href='detail-produk.html?id=${id}'" style="cursor:pointer;">${nama}</h3>
-              <p class="harga">Rp ${Number(harga).toLocaleString('id-ID')}</p>
-              <div class="btn-card-group">
-                  <a href="detail-produk.html?id=${id}">Detail</a>
-                  <button onclick="tambahKeKeranjang(${id}, '${nama}', ${harga})">Beli</button>
-              </div>
-          </div>`;
-      });
-    }
-    document.getElementById('list-produk').innerHTML = html;
-})
-.catch(err => {
-  document.getElementById('list-produk').innerHTML = "<p>❌ Gagal memuat produk. Cek koneksi & pastikan Sheet di 'Publikasikan ke web'</p>";
-  console.log(err)
-});
-
-// FUNGSI KERANJANG SEDERHANA
-let keranjang = JSON.parse(localStorage.getItem('keranjang')) || [];
-function tambahKeKeranjang(id, nama, harga){
-  keranjang.push({id, nama, harga, qty:1});
-  localStorage.setItem('keranjang', JSON.stringify(keranjang));
-  alert(nama + " ditambahkan ke keranjang!");
+// LOAD PRODUK DARI SHEET
+function loadProduk(){
+  const s = document.createElement('script');
+  s.src = SCRIPT_URL + "?callback=renderProduk&t=" + new Date().getTime();
+  document.body.appendChild(s);
 }
-</script>
 
+function renderProduk(data){
+  daftarProduk = data;
+  const wrap = document.getElementById('produk-container');
+  if(data.length === 0){ wrap.innerHTML = "Belum ada produk. Tambah di admin.html"; return; }
+  
+  wrap.innerHTML = data.map(p => `
+    <div class="produk-card">
+        <img src="${p.foto}" alt="${p.nama}" onclick="location.href='detail-produk.html?id=${p.id}'" style="cursor:pointer;">
+        <h3 onclick="location.href='detail-produk.html?id=${p.id}'" style="cursor:pointer;">${p.nama}</h3>
+        <p class="harga">Rp ${p.harga.toLocaleString('id-ID')}</p>
+        <div class="btn-card-group" style="display:flex; gap:8px;">
+            <a href="detail-produk.html?id=${p.id}" style="flex:1; background:#f0f0f0; color:#333; text-decoration:none; padding:10px; border-radius:10px; font-weight:600; font-size:14px; text-align:center;">Detail</a>
+            <button onclick="tambahKeKeranjang(${p.id}, '${p.nama}', ${p.harga})" style="flex:1;">Beli</button>
+        </div>
+    </div>
+  `).join('');
+  updateKeranjangIcon();
+}
+
+// FUNGSI KERANJANG
+function tambahKeKeranjang(id, nama, harga){
+  let item = keranjang.find(p => p.id === id);
+  if(item){ item.jumlah++; } else { keranjang.push({id, nama, harga, jumlah:1}); }
+  simpanKeranjang();
+  alert(`✅ ${nama} ditambah ke keranjang`);
+}
+function simpanKeranjang(){ localStorage.setItem('keranjangPKA', JSON.stringify(keranjang)); updateKeranjangIcon(); }
+function updateKeranjangIcon(){ document.getElementById('jumlah-keranjang').innerText = keranjang.reduce((a,b)=>a+b.jumlah,0); }
+function bukaKeranjang(){
+  let html = keranjang.length === 0? "<p>Keranjang kosong</p>" : keranjang.map(p=>`<p>${p.nama} x${p.jumlah} - Rp ${(p.harga*p.jumlah).toLocaleString('id-ID')}</p>`).join('');
+  document.getElementById('isi-keranjang').innerHTML = html;
+  let total = keranjang.reduce((a,b)=>a+b.harga*b.jumlah,0);
+  document.getElementById('total-harga').innerText = "Total: Rp " + total.toLocaleString('id-ID');
+  document.getElementById('modal-keranjang').style.display = 'block';
+}
+function tutupKeranjang(){ document.getElementById('modal-keranjang').style.display = 'none'; }
+function checkoutWA(){
+  let pesan = "Halo PKA UMKM, saya mau pesan:\n" + keranjang.map(p=>`${p.nama} x${p.jumlah}`).join('\n');
+  window.open(`https://wa.me/628998628025?text=${encodeURIComponent(pesan)}`, '_blank');
+}
+
+loadProduk();
+</script>
 </body>
 </html>
