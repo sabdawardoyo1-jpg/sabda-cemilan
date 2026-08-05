@@ -4,25 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detail Produk - PKA UMKM</title>
+<link rel="stylesheet" href="style.css">
 <style>
-body{font-family:Segoe UI;background:#fff8f0;margin:0;padding:0;color:#333}
-header{background:linear-gradient(135deg,#d97706,#f59e0b);color:white;padding:15px 20px;display:flex;justify-content:space-between;align-items:center}
-header h1{margin:0;font-size:20px}
-.keranjang-icon{position:relative;cursor:pointer;font-size:24px}
-#jumlah-keranjang{background:red;border-radius:50%;padding:2px 6px;font-size:12px;position:absolute;top:-5px;right:-10px}
 .container{max-width:1000px;margin:20px auto;padding:20px;background:white;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}
 .btn-kembali{display:inline-block;margin-bottom:20px;color:#d97706;text-decoration:none;font-weight:bold}
 .product-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px}
 .product-image-gallery img{width:100%;border-radius:12px}
 .product-title{font-size:28px;margin:0}
-.current-price{font-size:24px;color:#d97706;font-weight:bold;margin:10px 0}
-.btn-buy-now,.btn-wa-ask{display:block;width:100%;padding:14px;text-align:center;border:none;border-radius:8px;font-weight:bold;margin-top:10px;cursor:pointer;text-decoration:none}
-.btn-buy-now{background:#d97706;color:white}
-.btn-wa-ask{background:#25D366;color:white}
+.current-price{font-size:24px;color:#ff6b6b;font-weight:bold;margin:10px 0}
 @media(max-width:768px){.product-detail-grid{grid-template-columns:1fr}}
-.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
-.modal-content{background:white;margin:10% auto;padding:20px;border-radius:12px;width:90%;max-width:500px}
-.close{float:right;font-size:28px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -46,11 +36,41 @@ header h1{margin:0;font-size:20px}
   </div>
 </div>
 
-<script src="script1.js"></script>
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmu_GRCGWjOCyDPMjZCP1VI41O9aON3etuiLSL9ITBs9hR-wQHeyExANrUlQ_pNzwP/exec";
+let keranjang = JSON.parse(localStorage.getItem('keranjangPKA')) || [];
 let produkAktif = null;
+let produkSementara = null;
 
+// KODE KERANJANG SAMA PERSIS KAYAK DI HOME
+function tambahKeKeranjang(id, nama, harga) {
+    produkSementara = { id, nama, harga, jumlah: 1 };
+    bukaModalProduk();
+}
+function bukaModalProduk() {
+    document.getElementById('judul-modal').innerText = produkSementara.nama;
+    document.getElementById('isi-keranjang').innerHTML = `<div class="item-keranjang"><div><b>${produkSementara.nama}</b><br>Rp ${produkSementara.harga.toLocaleString('id-ID')}</div><div><button class="qty-btn" onclick="kurangQtySementara()">-</button><span style="padding: 0 10px; font-weight: bold;">${produkSementara.jumlah}</span><button class="qty-btn" onclick="tambahQtySementara()">+</button></div></div>`;
+    document.getElementById('total-harga').style.display = 'none';
+    document.getElementById('btn-aksi').style.display = 'block';
+    document.getElementById('btn-aksi').innerText = 'Tambah ke Keranjang';
+    document.getElementById('btn-aksi').onclick = konfirmasiTambah;
+    document.getElementById('modal-keranjang').style.display = 'flex';
+}
+function tambahQtySementara() { produkSementara.jumlah += 1; bukaModalProduk(); }
+function kurangQtySementara() { if (produkSementara.jumlah > 1) { produkSementara.jumlah -= 1; bukaModalProduk(); } }
+function konfirmasiTambah() { let item = keranjang.find(p => p.id === produkSementara.id); if (item) { item.jumlah += produkSementara.jumlah; } else { keranjang.push(produkSementara); } simpanKeranjang(); produkSementara = null; tutupKeranjang(); alert('✅ Produk ditambahkan ke keranjang!'); }
+function simpanKeranjang(){ localStorage.setItem('keranjangPKA', JSON.stringify(keranjang)); updateKeranjangIcon(); }
+function updateKeranjangIcon(){ document.getElementById('jumlah-keranjang').innerText = keranjang.reduce((a,b)=>a+b.jumlah,0); }
+function bukaKeranjang() { if (keranjang.length === 0) { alert('Keranjang masih kosong!'); return; } document.getElementById('judul-modal').innerText = 'Keranjang Belanja'; document.getElementById('total-harga').style.display = 'block'; updateKeranjang(); document.getElementById('isi-keranjang').innerHTML += `<h3 style="margin-top:20px; text-align:center;">Pilih Metode Pembayaran</h3><div class="metode-bayar"><button onclick="bayar('DANA')">💙 Bayar DANA</button><button onclick="bayar('GOPAY')">💚 Bayar GoPay</button><button onclick="bayar('MANDIRI')">💛 Bayar Mandiri</button></div>`; document.getElementById('btn-aksi').style.display = 'none'; document.getElementById('modal-keranjang').style.display = 'flex'; }
+function updateKeranjang() { let isi = document.getElementById('isi-keranjang'); let total = 0; isi.innerHTML = ''; keranjang.forEach((item, index) => { total += item.harga * item.jumlah; isi.innerHTML += `<div class="item-keranjang"><div><b>${item.nama}</b><br>Rp ${item.harga.toLocaleString('id-ID')} x ${item.jumlah}</div><div><button class="qty-btn" onclick="kurangQty(${index})">-</button><button class="qty-btn" onclick="tambahQty(${index})">+</button><button class="qty-btn hapus" onclick="hapusItem(${index})">Hapus</button></div></div>`; }); document.getElementById('total-harga').innerText = `Total: Rp ${total.toLocaleString('id-ID')}`; }
+function tambahQty(i){keranjang[i].jumlah++; simpanKeranjang(); bukaKeranjang();}
+function kurangQty(i){keranjang[i].jumlah>1?keranjang[i].jumlah--:keranjang.splice(i,1); simpanKeranjang(); bukaKeranjang();}
+function hapusItem(i){keranjang.splice(i,1); simpanKeranjang(); bukaKeranjang();}
+function tutupKeranjang(){document.getElementById('modal-keranjang').style.display='none';}
+function bayar(metode) { let total = keranjang.reduce((sum, item) => sum + item.harga * item.jumlah, 0); let infoPembayaran = ""; if(metode === 'DANA'){ infoPembayaran = `Transfer ke DANA: 08998628025<br><img src="dana.jpg" style="width:200px; margin:auto; display:block;">`; } if(metode === 'GOPAY'){ infoPembayaran = `Transfer ke GoPay: 08998628025<br><img src="gopay.jpg" style="width:200px; margin:auto; display:block;">`; } if(metode === 'MANDIRI'){ infoPembayaran = `Transfer ke Mandiri: 1270011397252 a/n Sabda Gusti Nang Wardoyo`; } document.getElementById('judul-modal').innerText = `Bayar via ${metode}`; document.getElementById('isi-keranjang').innerHTML = `<div style="text-align:center;"><h2 style="color:#ff6b6b;">Rp ${total.toLocaleString('id-ID')}</h2><p>${infoPembayaran}</p></div>`; localStorage.setItem('pesananSabda', JSON.stringify(keranjang)); document.getElementById('btn-aksi').style.display = 'block'; document.getElementById('btn-aksi').innerText = 'Upload Bukti Pembayaran'; document.getElementById('btn-aksi').onclick = () => { window.location.href = `bukti-pembayaran.html?metode=${metode}&total=${total}`; }; document.getElementById('total-harga').style.display = 'none'; }
+window.onclick = function(event) { let modal = document.getElementById('modal-keranjang'); if (event.target == modal) { modal.style.display = 'none'; } }
+
+// LOAD DETAIL
 function loadDetail(){
   const id = new URLSearchParams(window.location.search).get('id');
   if(!id) { document.getElementById('detail-wrapper').innerHTML="<h2>ID Produk tidak ada</h2>"; return; }
@@ -67,15 +87,12 @@ function renderDetail(data){
   document.title = produkAktif.nama + " - PKA UMKM";
   document.getElementById('detail-wrapper').innerHTML = `
   <div class="product-detail-grid">
-    <div class="product-image-gallery">
-      <img src="${produkAktif.foto}" onerror="this.src='https://via.placeholder.com/400'">
-    </div>
+    <div class="product-image-gallery"><img src="${produkAktif.foto}" onerror="this.src='https://via.placeholder.com/400'"></div>
     <div class="product-info">
       <h1 class="product-title">${produkAktif.nama}</h1>
       <div class="current-price">Rp ${Number(produkAktif.harga).toLocaleString('id-ID')}</div>
       <p style="line-height:1.7;margin:20px 0">${produkAktif.deskripsi}</p>
-      <button class="btn-buy-now" onclick="tambahKeKeranjang(${produkAktif.id}, '${produkAktif.nama}', ${produkAktif.harga})">🛒 Tambah Keranjang</button>
-      <a href="https://wa.me/${produkAktif.wa}?text=Halo%20saya%20mau%20tanya%20produk%20${produkAktif.nama}" target="_blank" class="btn-wa-ask">💬 Tanya via WhatsApp</a>
+      <button class="btn-checkout" onclick="tambahKeKeranjang(${produkAktif.id}, '${produkAktif.nama}', ${produkAktif.harga})">🛒 Tambah Keranjang</button>
     </div>
   </div>`;
   updateKeranjangIcon();
