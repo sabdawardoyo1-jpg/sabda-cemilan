@@ -14,30 +14,31 @@
 
 <section class="banner-salam">
     <h2>Info penting</h2>
-    <p>kami hanya mengirim pesanan di hari sabtu minggu</p>
+    <p>kami hanya mengirim pesanan di hari minggu</p>
 </section>
 
-    <main class="produk-container" id="produk-container">
-        Memuat produk...
-    </main>
+<main class="produk-container" id="produk-container">
+    Memuat produk...
+</main>
 
-<!-- MODAL KERANJANG -->
+<!-- MODAL KERANJANG + PILIH JUMLAH -->
 <div id="modal-keranjang" class="modal">
     <div class="modal-content">
         <span class="close" onclick="tutupKeranjang()">&times;</span>
-        <h2>Keranjang Belanja</h2>
+        <h2 id="judul-modal">Keranjang Belanja</h2>
         <div id="isi-keranjang"></div>
         <h3 id="total-harga">Total: Rp 0</h3>
-        <button id="btn-aksi" onclick="checkoutWA()">Checkout via WA</button>
+        <button id="btn-aksi"></button>
     </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmu_GRCGWjOCyDPMjZCP1VI41O9aON3etuiLSL9ITBs9hR-wQHeyExANrUlQ_pNzwP/exec"; 
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmu_GRCGWjOCyDPMjZCP1VI41O9aON3etuiLSL9ITBs9hR-wQHeyExANrUlQ_pNzwP/exec";
 let daftarProduk = [];
 let keranjang = JSON.parse(localStorage.getItem('keranjangPKA')) || [];
+let produkSementara = null;
 
-// LOAD PRODUK DARI SHEET
+// LOAD PRODUK
 function loadProduk(){
   const s = document.createElement('script');
   s.src = SCRIPT_URL + "?callback=renderProduk&t=" + new Date().getTime();
@@ -48,41 +49,122 @@ function renderProduk(data){
   daftarProduk = data;
   const wrap = document.getElementById('produk-container');
   if(data.length === 0){ wrap.innerHTML = "Belum ada produk. Tambah di admin.html"; return; }
-  
+
   wrap.innerHTML = data.map(p => `
     <div class="produk-card">
         <img src="${p.foto}" alt="${p.nama}" onclick="location.href='detail-produk.html?id=${p.id}'" style="cursor:pointer;">
         <h3 onclick="location.href='detail-produk.html?id=${p.id}'" style="cursor:pointer;">${p.nama}</h3>
-        <p class="harga">Rp ${p.harga.toLocaleString('id-ID')}</p>
+        <p class="harga">Rp ${Number(p.harga).toLocaleString('id-ID')}</p>
         <div class="btn-card-group" style="display:flex; gap:8px;">
             <a href="detail-produk.html?id=${p.id}" style="flex:1; background:#f0f0f0; color:#333; text-decoration:none; padding:10px; border-radius:10px; font-weight:600; font-size:14px; text-align:center;">Detail</a>
-            <button onclick="tambahKeKeranjang(${p.id}, '${p.nama}', ${p.harga})" style="flex:1;">Beli</button>
+            <button onclick="tambahKeKeranjang(${p.id}, '${p.nama}', ${p.harga})" style="flex:1;">Tambahkan keranjang</button>
         </div>
     </div>
   `).join('');
   updateKeranjangIcon();
 }
 
-// FUNGSI KERANJANG
-function tambahKeKeranjang(id, nama, harga){
-  let item = keranjang.find(p => p.id === id);
-  if(item){ item.jumlah++; } else { keranjang.push({id, nama, harga, jumlah:1}); }
-  simpanKeranjang();
-  alert(`✅ ${nama} ditambah ke keranjang`);
+// ===== SISTEM KERANJANG BARU SAMA KAYAK DETAIL =====
+function tambahKeKeranjang(id, nama, harga) {
+    produkSementara = { id, nama, harga, jumlah: 1 };
+    bukaModalProduk();
 }
+
+function bukaModalProduk() {
+    document.getElementById('judul-modal').innerText = produkSementara.nama;
+    document.getElementById('isi-keranjang').innerHTML = `
+        <div class="item-keranjang">
+            <div><b>${produkSementara.nama}</b><br>Rp ${produkSementara.harga.toLocaleString('id-ID')}</div>
+            <div>
+                <button class="qty-btn" onclick="kurangQtySementara()">-</button>
+                <span style="padding: 0 10px; font-weight: bold;">${produkSementara.jumlah}</span>
+                <button class="qty-btn" onclick="tambahQtySementara()">+</button>
+            </div>
+        </div>
+    `;
+    document.getElementById('total-harga').style.display = 'none';
+    document.getElementById('btn-aksi').style.display = 'block';
+    document.getElementById('btn-aksi').innerText = 'Tambah ke Keranjang';
+    document.getElementById('btn-aksi').onclick = konfirmasiTambah;
+    document.getElementById('modal-keranjang').style.display = 'flex';
+}
+
+function tambahQtySementara() { produkSementara.jumlah += 1; bukaModalProduk(); }
+function kurangQtySementara() { if (produkSementara.jumlah > 1) { produkSementara.jumlah -= 1; bukaModalProduk(); } }
+
+function konfirmasiTambah() {
+    let item = keranjang.find(p => p.id === produkSementara.id);
+    if (item) { item.jumlah += produkSementara.jumlah; }
+    else { keranjang.push(produkSementara); }
+    simpanKeranjang();
+    produkSementara = null;
+    tutupKeranjang();
+    alert('✅ Produk ditambahkan ke keranjang!');
+}
+
 function simpanKeranjang(){ localStorage.setItem('keranjangPKA', JSON.stringify(keranjang)); updateKeranjangIcon(); }
 function updateKeranjangIcon(){ document.getElementById('jumlah-keranjang').innerText = keranjang.reduce((a,b)=>a+b.jumlah,0); }
-function bukaKeranjang(){
-  let html = keranjang.length === 0? "<p>Keranjang kosong</p>" : keranjang.map(p=>`<p>${p.nama} x${p.jumlah} - Rp ${(p.harga*p.jumlah).toLocaleString('id-ID')}</p>`).join('');
-  document.getElementById('isi-keranjang').innerHTML = html;
-  let total = keranjang.reduce((a,b)=>a+b.harga*b.jumlah,0);
-  document.getElementById('total-harga').innerText = "Total: Rp " + total.toLocaleString('id-ID');
-  document.getElementById('modal-keranjang').style.display = 'block';
+
+function bukaKeranjang() {
+    if (keranjang.length === 0) { alert('Keranjang masih kosong!'); return; }
+    document.getElementById('judul-modal').innerText = 'Keranjang Belanja';
+    document.getElementById('total-harga').style.display = 'block';
+    updateKeranjang();
+    document.getElementById('isi-keranjang').innerHTML += `
+        <h3 style="margin-top:20px; text-align:center;">Pilih Metode Pembayaran</h3>
+        <div class="metode-bayar">
+            <button onclick="bayar('DANA')">💙 Bayar DANA</button>
+            <button onclick="bayar('GOPAY')">💚 Bayar GoPay</button>
+            <button onclick="bayar('MANDIRI')">💛 Bayar Mandiri</button>
+        </div>
+    `;
+    document.getElementById('btn-aksi').style.display = 'none';
+    document.getElementById('modal-keranjang').style.display = 'flex';
 }
+
+function updateKeranjang() {
+    let isi = document.getElementById('isi-keranjang');
+    let total = 0;
+    isi.innerHTML = '';
+    keranjang.forEach((item, index) => {
+        total += item.harga * item.jumlah;
+       isi.innerHTML += `
+        <div class="item-keranjang">
+            <div><b>${item.nama}</b><br>Rp ${item.harga.toLocaleString('id-ID')} x ${item.jumlah}</div>
+            <div>
+                <button class="qty-btn" onclick="kurangQty(${index})">-</button>
+                <button class="qty-btn" onclick="tambahQty(${index})">+</button>
+                <button class="qty-btn hapus" onclick="hapusItem(${index})">Hapus</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById('total-harga').innerText = `Total: Rp ${total.toLocaleString('id-ID')}`;
+}
+
+function tambahQty(i){keranjang[i].jumlah++; simpanKeranjang(); bukaKeranjang();}
+function kurangQty(i){keranjang[i].jumlah>1?keranjang[i].jumlah--:keranjang.splice(i,1); simpanKeranjang(); bukaKeranjang();}
+function hapusItem(i){keranjang.splice(i,1); simpanKeranjang(); bukaKeranjang();}
 function tutupKeranjang(){ document.getElementById('modal-keranjang').style.display = 'none'; }
-function checkoutWA(){
-  let pesan = "Halo PKA UMKM, saya mau pesan:\n" + keranjang.map(p=>`${p.nama} x${p.jumlah}`).join('\n');
-  window.open(`https://wa.me/628998628025?text=${encodeURIComponent(pesan)}`, '_blank');
+
+function bayar(metode) {
+    let total = keranjang.reduce((sum, item) => sum + item.harga * item.jumlah, 0);
+    let infoPembayaran = "";
+    if(metode === 'DANA'){ infoPembayaran = `Transfer ke DANA: 08998628025<br><img src="dana.jpg" style="width:200px; margin:auto; display:block;">`; }
+    if(metode === 'GOPAY'){ infoPembayaran = `Transfer ke GoPay: 08998628025<br><img src="gopay.jpg" style="width:200px; margin:auto; display:block;">`; }
+    if(metode === 'MANDIRI'){ infoPembayaran = `Transfer ke Mandiri: 1270011397252 a/n Sabda Gusti Nang Wardoyo`; }
+
+    document.getElementById('judul-modal').innerText = `Bayar via ${metode}`;
+    document.getElementById('isi-keranjang').innerHTML = `<div style="text-align:center;"><h2 style="color:#ff6b6b;">Rp ${total.toLocaleString('id-ID')}</h2><p>${infoPembayaran}</p></div>`;
+    localStorage.setItem('pesananSabda', JSON.stringify(keranjang));
+    document.getElementById('btn-aksi').style.display = 'block';
+    document.getElementById('btn-aksi').innerText = 'Upload Bukti Pembayaran';
+    document.getElementById('btn-aksi').onclick = () => { window.location.href = `bukti-pembayaran.html?metode=${metode}&total=${total}`; };
+    document.getElementById('total-harga').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    let modal = document.getElementById('modal-keranjang');
+    if (event.target == modal) { modal.style.display = 'none'; }
 }
 
 loadProduk();
